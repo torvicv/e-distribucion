@@ -1,0 +1,61 @@
+{% load bootstrap5 %} 
+{% bootstrap_css %} 
+{% bootstrap_javascript %} 
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% block js %}{% endblock js %}
+    {% block css %}{% endblock css %}
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+
+  <body>
+    {% block header %}{% endblock header %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="{% url 'home' %}"
+                >Home</a
+              >
+            </li>
+            {% for item in context %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{item.CUPS}}
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li class="dropdown-item">
+                  <a class="nav-link" href="{% url 'cycles' item %}">Ciclos</a>
+                </li>
+                <li class="dropdown-item">
+                  <a class="nav-link" href="{% url 'interval' item %}"
+                    >Búsqueda Avanzada</a
+                  >
+                </li>
+                <li class="dropdown-item">
+                  <a class="nav-link" href="{% url 'choose' item %}">Elegir</a>
+                </li>
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+  </body>
+</html>

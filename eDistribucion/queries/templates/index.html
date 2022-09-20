@@ -1,0 +1,21 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html>
+    <head>
+        {% load static %}
+        <link href="{% static 'queries/style.css' %}" rel="stylesheet"/>
+    </head>
+    <body>
+        <div class="container-home">
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="text-center">
+                    <input type="submit" value="Entrar" />
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

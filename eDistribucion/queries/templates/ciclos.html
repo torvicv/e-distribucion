@@ -1,0 +1,129 @@
+{% extends 'blocks/user-base.html' %}
+{% load bootstrap5 %} 
+{% block title %}{{title}}{% endblock title %}
+{% block css %}
+{% load static %}
+<link href="{% static 'queries/style.css' %}" rel="stylesheet"/>
+<link href="{% static 'queries/huicalendar.css' %}" rel="stylesheet"/>
+{% endblock css %}
+{% block js %}
+<script src="{% static 'js/ciclos.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="{% static 'js/huicalendar.js' %}"></script>
+{% endblock js %}
+{% block header %}
+<h1 class="bg-dark text-white p-2 text-center">
+    {{title}}
+</h1>
+{% endblock header %}
+{% block content %}
+<section class="container-cycle">   
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 cols-lg-5">
+    {% for days in dataCycle %}
+        {% comment %} <div>
+            <h3 class="btn btn-dark rounded w-100 text-center text-white fs-5 hover-dark"
+             data-bs-toggle="modal" data-bs-target="#exampleModal{{forloop.counter}}">
+             {{days.0.date}}
+            </h3>
+        </div> {% endcomment %}
+        <div class="modal fade w-100" id="exampleModal{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog mw-100">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h4 class="col-11 col-sm-11 col-md-11 col-lg-11 text-center text-white">{{days.0.date}}</h4>
+                        <button type="button" class="btn-close fs-4 pe-2 text-white d-flex flex-justify-center align-items-center" data-bs-dismiss="modal" aria-label="Close">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="cycles cycles">
+                            <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
+                                <table class="table table-dark table-striped table-hover table-responsive caption-top">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center" scope="col">Hora</th>
+                                        <th class="text-center" scope="col">Consumido</th>
+                                        <th class="text-center" scope="col">Precio Mwh</th>
+                                        <th class="text-center" scope="col">Calculo Precio Kwh</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for day in days %}
+                                        <tr>
+                                            <td class="text-center" scope="row">{{day.hour}}</td>
+                                            <td class="text-center">{{day.valueDouble|floatformat:3}}</td>
+                                            <td class="text-center">{{day.valueEsios|floatformat:3}}</td>
+                                            <td class="text-center">{{day.mulValue|floatformat:3}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+        <div class="myCalendar"></div>
+        <div class="myCalendar2"></div>
+        <script>
+            var a = "{{dataCycle|safe}}";
+            var b = a.replaceAll("\'", "\"").replaceAll("T", "t").replaceAll("F", "f");
+            var c = JSON.parse(b);
+            var arrayFirstMonth = [];
+            var arraySecondMonth = [];
+            var contador = 0;
+            for (let i in c.reverse()) {
+                if (arrayFirstMonth.length === 0 || parseInt(c[i][0].date.slice(0, 2)) > arrayFirstMonth[contador-1])
+                    arrayFirstMonth.push(parseInt(c[i][0].date.slice(0, 2)));
+                else 
+                    arraySecondMonth.push(parseInt(c[i][0].date.slice(0, 2)));
+                contador++;
+            }
+            d2 = c[c.length-1];
+            var fechaEs2 = "";
+            for (let i in d2) {
+                fechaEs2 = d2[0].date;
+            }
+            var fechaEn2 = fechaEs2.slice(0, 10).split('/').reverse().join('/');
+            d1 = c[0];
+            var fechaEs1 = "";
+            for (let i in d1) {
+                fechaEs1 = d1[0].date;
+            }
+            var fechaEn1 = fechaEs1.slice(0, 10).split('/').reverse().join('/');
+            console.log(arrayFirstMonth);
+            console.log(arraySecondMonth);
+            if (arrayFirstMonth.length > 0) {
+                $('.myCalendar').huicalendar({
+                    viewDay:new Date(fechaEn1),
+                    enabledDay: arrayFirstMonth
+                });
+            }
+            if (arraySecondMonth.length > 0) {
+                $('.myCalendar2').huicalendar({
+                    viewDay:new Date(fechaEn2),
+                    enabledDay: arraySecondMonth
+                });
+            }
+                
+        </script>
+    </div>
+    {% if cycles %}
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            {% bootstrap_form form %}
+        </div>
+        <input type="submit" value="Entrar" />
+    </form>
+    {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+        {{message}}
+        {% endfor %}
+    {% endif %}
+</section>
+{% endblock content %}

@@ -1,0 +1,135 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.container-cycle {
+    margin: 8px;
+}
+
+.cups a {
+    background-color: blue;
+    color: white;
+    padding: 10px 15px;
+}
+
+.cups a:first-child {
+    border-right: 2px;
+}
+
+.cups {
+    margin: 20px 0;
+}
+
+.odd {
+    background-color: blue;
+    color: white;
+    padding: 8px 10px;
+    margin: 8px 0;
+    white-space: nowrap;
+}
+
+.even {
+    background-color: black;
+    color: white;
+    padding: 8px 10px;
+    margin: 8px 0;
+    white-space: nowrap;
+}
+
+.cycles {
+    line-height: 38px;
+    z-index: -1;
+    top: 35%;
+}
+
+.cycles-5 {
+    line-height: 38px;
+    z-index: -1;
+    top: 5%;
+}
+
+.container-home {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.container-interval {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 24px;
+}
+
+.container-elegir {
+    margin: 24px;
+}
+
+.container-home > form, .container-interval > form {
+    width: 70%;
+}
+
+.panel-dia {
+    padding: 10px;
+    box-shadow: 4px 4px 8px black, -4px -4px 8px black, 4px -4px 8px black, -4px 4px 8px black, 8px 8px 16px blue, -8px -8px 16px blue, 8px -8px 16px blue, -8px 8px 16px blue;
+    border-radius: 8px;
+}
+
+.pointer {
+    cursor: pointer;
+    z-index: 9;
+}
+/* 
+h3.pe-auto.pointer::after {
+    content: "";
+    border-width: 10px;
+    border-color: transparent transparent black transparent;
+    border-style: solid;
+    height: 10px;
+    width: 10px;
+    transform: rotate(90deg);
+    display: inline-block;
+    margin-left: 15px;
+    margin: auto 15px;
+} */
+
+.hover-dark:hover {
+    background-color: rgba(0, 0, 0, 0.5)
+}
+
+h3.pe-auto.pointer {
+    display: grid;
+    grid-template-columns: 160px auto;
+    margin: 1px;
+}
+
+h3.pe-auto.pointer > span {
+    border-radius: 50% 50% 0 0;
+}
+
+.div-separator {
+    border-bottom: 1px solid blue;
+    width: 185px;
+}
+
+.cycle-padding-small {
+    padding: 2px 0;
+}
+
+@media screen and (max-width: 992px) {
+    .cycles-text {
+        font-size: 14px;
+    }   
+}
+
+#form-radio-select div div {
+    display: flex;
+    flex-direction: column;
+}
