@@ -46,11 +46,11 @@ huicalendar.prototype = {
             // }
             // añadido victor
             if(i%7 == 0 && ($.inArray(calendar[i], this.enabledDay) != -1)){
-                tbody += '<tr> <td data-bs-toggle="modal" data-bs-target="#exampleModal'+(c.length-counter)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td>';
+                tbody += '<tr> <td data-bs-toggle="modal" data-bs-target="#exampleModal'+((c.length > 0) ? (c.length-counter) : counter+1)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td>';
             } else if(i%7 == 6 && ($.inArray(calendar[i], this.enabledDay) != -1)){
-                tbody += '<td data-bs-toggle="modal" data-bs-target="#exampleModal'+(c.length-counter)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td> </tr>';
+                tbody += '<td data-bs-toggle="modal" data-bs-target="#exampleModal'+((c.length > 0) ? (c.length-counter) : counter+1)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td> </tr>';
             } else if ($.inArray(calendar[i], this.enabledDay) != -1) {
-                tbody += '<td data-bs-toggle="modal" data-bs-target="#exampleModal'+(c.length-counter)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td>';
+                tbody += '<td data-bs-toggle="modal" data-bs-target="#exampleModal'+((c.length > 0) ? (c.length-counter) : counter+1)+'" class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td>';
             } else if(i%7 == 0){
                 tbody += '<tr> <td class="'+( ($.inArray(calendar[i], this.enabledDay) == -1)? '':'enabled' )+'">'+calendar[i]+'</td>';
             } else if(i%7 == 6){

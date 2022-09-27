@@ -6,6 +6,7 @@
 {% load static %}
 <link href="{% static 'queries/style.css' %}" rel="stylesheet"/>
 <link href="{% static 'queries/huicalendar.css' %}" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet" />
 {% endblock css %}
 
 {% block js %}
@@ -29,14 +30,29 @@
         </form>
     {% endif %}
     {% if chosenDay %}
-        <table class="table table-dark table-striped table-hover table-responsive caption-top">
-            <caption class="bg-dark text-white fs-2 text-center">{{fecha}}</caption>
+        <table class="table table-dark table-striped table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">Día</th>
+                    <th class="text-center" scope="col">Consumido</th>
+                    <th class="text-center" scope="col">Precio Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center" scope="row">{{item.24.day}}</td>
+                    <td class="text-center">{{item.24.sum|floatformat:3}}</td>
+                    <td class="text-center">{{item.24.sumConsume|floatformat:3}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-dark table-striped table-hover table-responsive">
             <thead>
               <tr>
                 <th class="text-center" scope="col">Hora</th>
                 <th class="text-center" scope="col">Consumido</th>
-                <th class="text-center" scope="col">Precio Mwh</th>
-                <th class="text-center" scope="col">Calculo Precio Kwh</th>
+                <th class="text-center" scope="col">Precio MWh</th>
+                <th class="text-center" scope="col">Calculo Precio kWwh</th>
               </tr>
             </thead>
             <tbody>
@@ -50,6 +66,12 @@
             {% endfor %}
             </tbody>
           </table>
+          <iframe class="col-12 col-sm-12 col-md-12 col-lg-12" id="main-iframe" src="{% url 'line_chart' %}"></iframe>
+          <script>
+            $('iframe').on('load', function() {
+                $('iframe').height(100 + $('iframe').contents().find('#myChart').height());
+            });
+          </script>
     {% endif %}
     {% if chooseWeek %}
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 cols-lg-5">
@@ -63,55 +85,93 @@
         {% for days in item %}
             {% with forloop.counter as index %}
             {% for key2, value2 in days.items %}
-        <div class="modal fade w-100" id="exampleModal{{index}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog mw-100">
-                <div class="modal-content">
-                <div class="modal-header bg-dark">
-                {% comment %} {% for day in days.1 %}
-                    {% if forloop.first %}
-                    <h4 class="col-11 col-sm-11 col-md-11 col-lg-11 text-center text-white">{{days.0}}</h4>
-                    {% endif %}
-                {% endfor %} {% endcomment %}
-                    <button type="button" class="btn-close fs-4 pe-2 text-white d-flex flex-justify-center align-items-center" data-bs-dismiss="modal" aria-label="Close">X</button>
-                </div>
-                <div class="modal-body">
-                    <div class="cycles cycles">
-                        <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
-                            <table class="table table-dark table-striped table-hover table-responsive caption-top">
-                                <thead>
-                                  <tr>
-                                    <th class="text-center" scope="col">Hora</th>
-                                    <th class="text-center" scope="col">Consumido</th>
-                                    <th class="text-center" scope="col">Precio Mwh</th>
-                                    <th class="text-center" scope="col">Calculo Precio Kwh</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                {% comment %} {% for day in days.1 %} {% endcomment %}
-                                {% for day in value2 %}
-                                    <tr>
-                                        <td class="text-center" scope="row">{{day.hour}}</td>
-                                        <td class="text-center">{{day.value|floatformat:3}}</td>
-                                        <td class="text-center">{{day.valueEsios|floatformat:3}}</td>
-                                        <td class="text-center">{{day.mulValue|floatformat:3}}</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                              </table>
+            <div class="modal fade w-100" id="exampleModal{{index}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog mw-100">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark">
+                            <button type="button" class="btn-close fs-4 pe-2 text-white d-flex flex-justify-center align-items-center" data-bs-dismiss="modal" aria-label="Close">X</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="cycles cycles">
+                                <div class="row row-cols-sm-2 row-cols-md-3 me-4 me-md-0">
+                                    <table class="table table-dark table-striped table-hover table-responsive caption-top">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" scope="col">Día</th>
+                                                <th class="text-center" scope="col">Consumido Por Día</th>
+                                                <th class="text-center" scope="col">Precio Total Por Día</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center" scope="row">{{value2.24.day}}</td>
+                                                <td class="text-center">{{value2.24.sumTotal|floatformat:3}}</td>
+                                                <td class="text-center">{{value2.24.sumConsumeByDay|floatformat:3}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
+                                    <table class="table table-dark table-striped table-hover table-responsive caption-top">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center" scope="col">Hora</th>
+                                            <th class="text-center" scope="col">Consumido</th>
+                                            <th class="text-center" scope="col">Precio MWh</th>
+                                            <th class="text-center" scope="col">Calculo Precio kWh</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for day in value2 %}
+                                            <tr>
+                                                <td class="text-center" scope="row">{{day.hour}}</td>
+                                                <td class="text-center">{{day.value|floatformat:3}}</td>
+                                                <td class="text-center">{{day.valueEsios|floatformat:3}}</td>
+                                                <td class="text-center">{{day.mulValue|floatformat:3}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-                </div>
             </div>
-        </div>
             {% endfor %}
             {% endwith %}
         {% endfor %}
-        <div class="myCalendar"></div>
-        <div class="myCalendar2"></div>
+        <div class="d-flex flex-column">
+            <div class="myCalendar"></div>
+            <div class="myCalendar2"></div>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/total-price.svg" width="64" height="64" alt="icono precio total" title="precio precio total" />
+            <span>
+                Precio Total:
+            </span>
+            <span>
+                {{sum|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/avg.svg" width="64" height="64" alt="icono precio medio" title="precio medio" />
+            <span>
+                Precio medio por día:
+            </span>
+            <span>
+                {{avg|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/calendar.svg" width="64" height="64" alt="icono cantidad días" title="cantidad días" />
+            <span>
+                {{days}} días
+            </span>
+        </div>
         <script>
             var a = "{{item|safe}}";
             var b = a.replaceAll("\'", "\"").replaceAll("T", "t").replaceAll("F", "f");
@@ -157,6 +217,12 @@
             }
                 
         </script>
+        <iframe class="col-12 col-sm-12 col-md-12 col-lg-12" id="main-iframe" src="{% url 'line_chart' %}" width="100%" height="100%"></iframe>
+        <script>
+            $('iframe').on('load', function() {
+                $('iframe').height(100 + $('iframe').contents().find('#myChart').height());
+            });
+        </script>
     </div>
     {% endif %}
     {% if chooseMonth %}
@@ -164,12 +230,6 @@
         {% for days in result %}
             {% with forloop.counter as index %}
             {% for key2, value2 in days.items %}
-            {% comment %} <div>
-                <h3 class="btn btn-dark rounded w-100 text-center text-white fs-5 hover-dark"
-                data-bs-toggle="modal" data-bs-target="#exampleModal{{index}}">
-                {{key2}}
-                </h3>
-            </div> {% endcomment %}
             <div class="modal fade w-100" id="exampleModal{{index}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog mw-100">
                     <div class="modal-content">
@@ -178,14 +238,32 @@
                         </div>
                         <div class="modal-body">
                             <div class="cycles cycles">
+                                <div class="row row-cols-sm-2 row-cols-md-3 me-4 me-md-0">
+                                    <table class="table table-dark table-striped table-hover table-responsive caption-top">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" scope="col">Día</th>
+                                                <th class="text-center" scope="col">Consumido Por Día</th>
+                                                <th class="text-center" scope="col">Precio Total Por Día</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center" scope="row">{{value2.24.day}}</td>
+                                                <td class="text-center">{{value2.24.sumTotal|floatformat:3}}</td>
+                                                <td class="text-center">{{value2.24.sumConsumeByDay|floatformat:3}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
                                     <table class="table table-dark table-striped table-hover table-responsive caption-top">
                                         <thead>
                                         <tr>
                                             <th class="text-center" scope="col">Hora</th>
                                             <th class="text-center" scope="col">Consumido</th>
-                                            <th class="text-center" scope="col">Precio Mwh</th>
-                                            <th class="text-center" scope="col">Calculo Precio Kwh</th>
+                                            <th class="text-center" scope="col">Precio MWh</th>
+                                            <th class="text-center" scope="col">Calculo Precio kWh</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -211,8 +289,34 @@
             {% endfor %}
             {% endwith %}
         {% endfor %}
-        <div class="myCalendar"></div>
-        <div class="myCalendar2"></div>
+        <div class="d-flex flex-column">
+            <div class="myCalendar"></div>
+            <div class="myCalendar2"></div>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/total-price.svg" width="64" height="64" alt="icono precio total" title="precio precio total" />
+            <span>
+                Precio Total:
+            </span>
+            <span>
+                {{sum|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/avg.svg" width="64" height="64" alt="icono precio medio" title="precio medio" />
+            <span>
+                Precio medio por día:
+            </span>
+            <span>
+                {{avg|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/calendar.svg" width="64" height="64" alt="icono cantidad días" title="cantidad días" />
+            <span>
+                {{days}} días
+            </span>
+        </div>
         <script>
             var a = "{{result|safe}}";
             var b = a.replaceAll("\'", "\"").replaceAll("T", "t").replaceAll("F", "f");
@@ -258,34 +362,62 @@
             }
                 
         </script>
+        <iframe class="col-12 col-sm-12 col-md-12 col-lg-12" id="main-iframe" src="{% url 'line_chart' %}" width="100%" height="100%"></iframe>
+        <script>
+            $('iframe').on('load', function() {
+                $('iframe').height(100 + $('iframe').contents().find('#myChart').height());
+            });
+        </script>
     </div>
     {% endif %}
     {% if measDay %}
-                <table class="table table-dark table-striped table-hover table-responsive caption-top">
-                    {% for item in measDay.lstMonthlyPoints %}
-                    <caption class="bg-dark text-white fs-2 text-center">{{item.date}} - {{item.value|floatformat:3}}</caption>
-                    {% endfor %}
-                    <thead>
-                      <tr>
-                        <th class="text-center" scope="col">Hora</th>
-                        <th class="text-center" scope="col">Consumido</th>
-                        <th class="text-center" scope="col">Precio Mwh</th>
-                        <th class="text-center" scope="col">Calculo Precio Kwh</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in measDay.lstData %}
-                    {% for it in item %}
-                        <tr>
-                            <td class="text-center" scope="row">{{it.hour}}</td>
-                            <td class="text-center">{{it.valueDouble|floatformat:3}}</td>
-                            <td class="text-center">{{it.valueEsios|floatformat:3}}</td>
-                            <td class="text-center">{{it.mulValue|floatformat:3}}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    {% endfor %}
-                </table>
+        <table class="table table-dark table-striped table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">Día</th>
+                    <th class="text-center" scope="col">Consumido</th>
+                    <th class="text-center" scope="col">Precio Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center" scope="row">{{measDay.lstData.0.24.day}}</td>
+                    <td class="text-center">{{measDay.lstData.0.24.sum|floatformat:3}}</td>
+                    <td class="text-center">{{measDay.lstData.0.24.sumConsume|floatformat:3}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-dark table-striped table-hover table-responsive caption-top">
+            {% for item in measDay.lstMonthlyPoints %}
+            <caption class="bg-dark text-white fs-2 text-center">{{item.date}} - {{item.value|floatformat:3}}</caption>
+            {% endfor %}
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">Hora</th>
+                <th class="text-center" scope="col">Consumido</th>
+                <th class="text-center" scope="col">Precio MWh</th>
+                <th class="text-center" scope="col">Calculo Precio kWh</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for item in measDay.lstData %}
+            {% for it in item %}
+                <tr>
+                    <td class="text-center" scope="row">{{it.hour}}</td>
+                    <td class="text-center">{{it.valueDouble|floatformat:3}}</td>
+                    <td class="text-center">{{it.valueEsios|floatformat:3}}</td>
+                    <td class="text-center">{{it.mulValue|floatformat:3}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
+        <iframe class="col-12 col-sm-12 col-md-12 col-lg-12" id="main-iframe" src="{% url 'line_chart' %}" width="100%" height="100%"></iframe>
+        <script>
+            $('iframe').on('load', function() {
+                $('iframe').height(100 + $('iframe').contents().find('#myChart').height());
+            });
+        </script>
     {% endif %}
     </section>
 {% endblock content %}

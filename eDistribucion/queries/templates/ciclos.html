@@ -38,6 +38,24 @@
                             <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
                                 <table class="table table-dark table-striped table-hover table-responsive caption-top">
                                     <thead>
+                                        <tr>
+                                            <th class="text-center" scope="col">Día</th>
+                                            <th class="text-center" scope="col">Consumido Por Día</th>
+                                            <th class="text-center" scope="col">Precio Total Por Día</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" scope="row">{{days.24.day}}</td>
+                                            <td class="text-center">{{days.24.sumTotal|floatformat:3}}</td>
+                                            <td class="text-center">{{days.24.sumConsumeByDay|floatformat:3}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 me-4 me-md-0">
+                                <table class="table table-dark table-striped table-hover table-responsive caption-top">
+                                    <thead>
                                     <tr>
                                         <th class="text-center" scope="col">Hora</th>
                                         <th class="text-center" scope="col">Consumido</th>
@@ -66,8 +84,47 @@
             </div>
         </div>
     {% endfor %}
-        <div class="myCalendar"></div>
-        <div class="myCalendar2"></div>
+    {% if dataCycle %}
+        <div class="d-flex flex-column">
+            <div class="myCalendar"></div>
+            <div class="myCalendar2"></div>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/avg.svg" width="64" height="64" alt="icono precio medio" title="precio medio" />
+            <span>
+                Precio medio por día:
+            </span>
+            <span>
+                {{avgDays|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/total-price.svg" width="64" height="64" alt="icono precio total" title="precio precio total" />
+            <span>
+                Total Consumido:
+            </span>
+            <span>
+                {{sumConsumeDays|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/avg.svg" width="64" height="64" alt="icono precio medio" title="precio medio" />
+            <span>
+                Precio Total:
+            </span>
+            <span>
+                {{sumPriceDays|floatformat:"2"}} <i class="fa-solid fa-euro-sign"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center shadow p-3 bg-body rounded">
+            <img src="../../static/images/calendar.svg" width="64" height="64" alt="icono cantidad días" title="cantidad días" />
+            <span>
+                Cantidad Días:
+            </span>
+            <span>
+                {{days}} días
+            </span>
+        </div>
         <script>
             var a = "{{dataCycle|safe}}";
             var b = a.replaceAll("\'", "\"").replaceAll("T", "t").replaceAll("F", "f");
@@ -110,15 +167,24 @@
             }
                 
         </script>
+        <iframe class="col-12 col-sm-12 col-md-12 col-lg-12" id="main-iframe" src="{% url 'line_chart' %}" width="100%" height="100%"></iframe>
+        <script>
+            $('iframe').on('load', function() {
+                $('iframe').height(100 + $('iframe').contents().find('#myChart').height());
+            });
+        </script>
     </div>
+    {% endif %}
     {% if cycles %}
-    <form method="POST">
-        {% csrf_token %}
-        <div>
-            {% bootstrap_form form %}
-        </div>
-        <input type="submit" value="Entrar" />
-    </form>
+    <div class="w-100">
+        <form method="POST">
+            {% csrf_token %}
+            <div>
+                {% bootstrap_form form %}
+            </div>
+            <input type="submit" value="Entrar" class="btn btn-primary w-100 text-center" />
+        </form>
+    </div>
     {% endif %}
     {% if messages %}
         {% for message in messages %}
